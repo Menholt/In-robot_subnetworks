@@ -39,7 +39,7 @@ def calc_inteference(time):
         direction_change_counter += 1
         direction_change_counter = direction_change_counter * (directions != directions_new)
         directions = directions_new
-        if np.max(direction_change_counter)>=10:
+        if np.max(direction_change_counter)>=1000:
             idx = np.argmax(direction_change_counter)
             node_loc[i+1, idx], directions[idx] = i_f.new_deployment(node_loc[i+1], idx, width, height, min_dist, cell_radius)
 

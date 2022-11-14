@@ -127,7 +127,9 @@ def deployment(n_points, width, height, min_dist, cell_radius):
 
 
 def new_deployment(node_loc, idx, width, height, min_dist, cell_radius):
-    
+    """
+    Redeploys a node with index idx after being stuck in another node for 0.1 second.
+    """
     x_supp = [-width/2 + cell_radius, width/2 - cell_radius]
     y_supp = [-height/2 + cell_radius, height/2 - cell_radius]
     new_node_loc = np.zeros(2)
