@@ -5,8 +5,6 @@ Created on Mon Feb 21 14:42:37 2022
 @author: EG
 """
 import numpy as np
-# from tqdm import tqdm
-from numba import njit
 
 
 def createMap(width, height, sigmaS, correlationDistance, stepsize):
@@ -82,7 +80,6 @@ def interfere_displacement(cell_radius):
     return [theta, radius]
 
 def collision_nodes(x_0, x_1, spread = np.pi):
-    # if x_0[0] != x_1[0]:
     tan_ang = np.arctan((x_0[1]-x_1[1]) / (x_0[0]-x_1[0]))
     if x_0[0] > x_1[0]:
         dir_x0 = np.random.uniform(tan_ang - spread/2, tan_ang + spread/2)
@@ -170,8 +167,6 @@ def random_direction(node_loc, directions, vel, min_dist, cell_radius, time_step
             if np.linalg.norm(node_loc_upd[i] - node_loc_upd[j]) < min_dist:
                 directions_upd[i] = np.random.uniform(0,2*np.pi)
                 directions_upd[j] = np.random.uniform(0,2*np.pi)
-                # directions_upd[i], directions_upd[j] = collision_nodes_random(node_loc[i], node_loc[j])
-                # directions_upd[i], directions_upd[j] = collision_nodes(node_loc[i], node_loc[j])
                 collision_counter += 1
                 
         if collision_counter == 0:
@@ -179,30 +174,28 @@ def random_direction(node_loc, directions, vel, min_dist, cell_radius, time_step
          #Collision with wall
         if(node_loc_upd[i,0] < -width/2 + cell_radius):
             directions_upd[i] = np.random.uniform(-np.pi/2+np.pi/8, np.pi/2-np.pi/8)
-            # node_loc_upd[i,0] = node_loc[i,0] + 2 * np.cos(directions[i]) * vel*time_step 
+
         if(node_loc_upd[i,0] > width/2 - cell_radius):
             directions_upd[i] = np.random.uniform(np.pi/2+np.pi/8, 3*np.pi/2-np.pi/8)
-            # node_loc_upd[i,0] = node_loc[i,0] + 2 * np.cos(directions[i]) * vel*time_step 
+ 
         if(node_loc_upd[i,1] < -height/2 + cell_radius):
             directions_upd[i] = np.random.uniform(0+np.pi/8, np.pi-np.pi/8)
-            # node_loc_upd[i,1] = node_loc[i,1] + 2 * np.sin(directions[i]) * vel*time_step 
+
         if (node_loc_upd[i,1] > height/2 - cell_radius):
             directions_upd[i] = np.random.uniform(-np.pi+np.pi/8, 0-np.pi/8)
-            # node_loc_upd[i,1] = node_loc[i,1] + 2 * np.sin(directions[i]) * vel*time_step 
+
     return node_loc_upd, directions_upd  
 
 # @njit
 def path_loss(x_0, x, alpha):
     return min(1, np.linalg.norm(x-x_0)**(-alpha))
-    # return np.linalg.norm(x-x_0)**(-alpha)
-
 
 
 
 def small_scale_fading(t, M, doppler, beta_n, theta):
     H = np.abs(np.sqrt(2/M)*(np.sum((np.cos(beta_n)+1j*np.sin(beta_n))*np.cos(doppler*t+theta))))
     return H**2
-    # return 1
+
 
 
 
@@ -216,7 +209,6 @@ def interference_power(kappa, x_0, x, alpha, t, theta, M, doppler, beta_n, grf, 
     path_l = path_loss(x_0, x, alpha)
     ss_fading = small_scale_fading(t, M, doppler, beta_n, theta)
     shadow = shadowing(grf, delta, x, x_0, stepsize, height, width)
-    # return kappa*path_loss(x_0, x, alpha)*small_scale_fading(t,node_number, max_doppler, M, N, K, alpha_n, doppler, beta_n, 0)**2 * shadowing(grf, delta, x, x_0, stepsize, height, width)
     interference = path_l * ss_fading * shadow
     return interference
 
@@ -224,6 +216,5 @@ def interference_power_med_resten(kappa, x_0, x, alpha, t, theta, M, doppler, be
     path_l = path_loss(x_0, x, alpha)
     ss_fading = small_scale_fading(t, M, doppler, beta_n, theta)
     shadow = shadowing(grf, delta, x, x_0, stepsize, height, width)
-    # return kappa*path_loss(x_0, x, alpha)*small_scale_fading(t,node_number, max_doppler, M, N, K, alpha_n, doppler, beta_n, 0)**2 * shadowing(grf, delta, x, x_0, stepsize, height, width)
     interference = path_l * ss_fading * shadow
     return interference, path_l, ss_fading, shadow
